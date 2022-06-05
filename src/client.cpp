@@ -25,6 +25,7 @@ int connect(int socketfd, const char* ip, int port) {
 }
 
 int main() {
+    // stick_this_thread_to_core(1);
     std::cout << "This is client" << std::endl;
 
     // create socket

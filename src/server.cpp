@@ -90,6 +90,7 @@ int readData(int socketfd) {
 }
 
 int main() {
+    // stick_this_thread_to_core(0);
     std::cout << "This is server" << std::endl;
     // create socket
     int listenfd = socket(AF_INET, SOCK_STREAM, 0);

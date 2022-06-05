@@ -5,11 +5,7 @@
 #define PORT 8000
 #define BACKLOG 5
 #define EPOLL_MAX_EVENTS 10
-// #define BUFSIZE 131070 // 331.489μs
-// #define BUFSIZE 109225  // 331.258μs
-// #define BUFSIZE 90225  // 400.894μs
-#define BUFSIZE 87380  // 179μs
-// #define BUFSIZE 43690  // 683.645μs
+#define BUFSIZE 8388608
 
 char msg[1024 * 1024];
 // char msg[128];
@@ -36,8 +32,14 @@ bool setSocketFlag(int socketfd, int flag) {
     return true;
 }
 
+int getSoBuffSize(int socketfd, int optname) {
+    int bufsize = 0;
+    socklen_t bufLen = sizeof(bufsize);
+    getsockopt(socketfd, SOL_SOCKET, optname, &bufsize, &bufLen);
+    return bufsize;
+}
 // optname: SO_SNDBUF, SO_RCVBUF
-void setSocketBuff(int socketfd, int optname, int bufsize) {
+void setSoBuffSize(int socketfd, int optname, int bufsize) {
     // socklen_t optlen = sizeof(bufsize);
     if (setsockopt(socketfd, SOL_SOCKET, optname, &bufsize, sizeof(int)) == -1) {
         std::cerr << "set buff size fail: " << strerror(errno) << std::endl;

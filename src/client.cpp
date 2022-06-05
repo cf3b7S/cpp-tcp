@@ -45,19 +45,13 @@ int main() {
         return -1;
     }
 
-    setSocketBuff(clientfd, SO_SNDBUF, 6291456);
+    setSoBuffSize(clientfd, SO_SNDBUF, BUFSIZE);
 
-    int sendBuf = 0;
-    socklen_t sendBufLen = sizeof(sendBufLen);
-    getsockopt(clientfd, SOL_SOCKET, SO_SNDBUF, &sendBuf, &sendBufLen);
-    std::cout << "sendBuf: " << sendBuf << std::endl;
+    int sendBufSize = getSoBuffSize(clientfd, SO_SNDBUF);
+    std::cout << "sendBufSize: " << sendBufSize << std::endl;
 
-    int recvBuf = 0;
-    socklen_t recvBufLen = sizeof(recvBufLen);
-    getsockopt(clientfd, SOL_SOCKET, SO_RCVBUF, &recvBuf, &recvBufLen);
-    std::cout << "recvBuf: " << recvBuf << std::endl;
-
-    // setSocketBuff(clientfd, SO_SNDBUF, BUFSIZE);
+    int recvBufSize = getSoBuffSize(clientfd, SO_RCVBUF);
+    std::cout << "recvBufSize: " << recvBufSize << std::endl;
 
     // int one = 1;
     // setsockopt(clientfd, IPPROTO_TCP, TCP_NODELAY, &one, sizeof(one));

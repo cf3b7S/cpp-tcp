@@ -45,23 +45,34 @@ int main() {
         return -1;
     }
 
+    setSocketBuff(clientfd, SO_SNDBUF, 6291456);
+
+    int sendBuf = 0;
+    socklen_t sendBufLen = sizeof(sendBufLen);
+    getsockopt(clientfd, SOL_SOCKET, SO_SNDBUF, &sendBuf, &sendBufLen);
+    std::cout << "sendBuf: " << sendBuf << std::endl;
+
+    int recvBuf = 0;
+    socklen_t recvBufLen = sizeof(recvBufLen);
+    getsockopt(clientfd, SOL_SOCKET, SO_RCVBUF, &recvBuf, &recvBufLen);
+    std::cout << "recvBuf: " << recvBuf << std::endl;
+
+    // setSocketBuff(clientfd, SO_SNDBUF, BUFSIZE);
+
     // int one = 1;
     // setsockopt(clientfd, IPPROTO_TCP, TCP_NODELAY, &one, sizeof(one));
     // setsockopt(clientfd, IPPROTO_TCP, TCP_QUICKACK, &one, sizeof(one));
 
-    char data[1024 * 1024];
-    // char buf[1024 * 1024];
-    char d[100];
-    memset(data, 0, sizeof(data));
+    memset(msg, 0, sizeof(msg));
     // std::cout << sizeof(data) << std::endl;
 
     int cnt = 100000;
     auto start = system_clock::now();
     while (cnt > 0) {
         // std::cin >> d;
-        int total = sizeof(data);
+        int total = sizeof(msg);
         int remain = total;
-        char* p = data;
+        char* p = msg;
         while (true) {
             int len = send(clientfd, p, remain, 0);
             // if (len == -1) {

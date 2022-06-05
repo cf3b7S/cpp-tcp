@@ -62,7 +62,6 @@ int addEpollEvent(int epollfd, int socketfd) {
 }
 
 int readData(int socketfd) {
-    char msg[1024 * 1024];
     memset(msg, 0, sizeof(msg));
 
     while (true) {
@@ -140,6 +139,11 @@ int main() {
         return -1;
     }
 
+    int recvBuf = 0;
+    socklen_t recvBufLen = sizeof(recvBufLen);
+    getsockopt(listenfd, SOL_SOCKET, SO_RCVBUF, &recvBuf, &recvBufLen);
+    std::cout << "listenfd recvBuf: " << recvBuf << std::endl;
+
     int connfd;
     struct epoll_event events[EPOLL_MAX_EVENTS];
     while (true) {
@@ -152,6 +156,11 @@ int main() {
                 if (addEpollEvent(epollfd, connfd) == -1) {
                     return -1;
                 }
+                setSocketBuff(connfd, SO_RCVBUF, 6291456);
+                int recvBuf = 0;
+                socklen_t recvBufLen = sizeof(recvBufLen);
+                getsockopt(connfd, SOL_SOCKET, SO_RCVBUF, &recvBuf, &recvBufLen);
+                std::cout << "connfd recvBuf: " << recvBuf << std::endl;
                 continue;
             }
 

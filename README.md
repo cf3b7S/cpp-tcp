@@ -1,4 +1,3 @@
-cmake 编译 有些问题
+cmake -S . -B build/ && cmake --build build
 
-g++ server.cpp -o server -levent
-g++ client.cpp -o client -levent
+179.808μs

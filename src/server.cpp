@@ -3,6 +3,7 @@
 #include <fcntl.h>
 #include <netdb.h>
 #include <netinet/in.h>
+#include <netinet/tcp.h>
 #include <sys/epoll.h>
 #include <sys/socket.h>
 #include <sys/types.h>
@@ -112,6 +113,11 @@ int main() {
         return -1;
     }
 
+    // int one = 1;
+    // setsockopt(listenfd, IPPROTO_TCP, TCP_NODELAY, &one, sizeof(one));
+    // setsockopt(listenfd, IPPROTO_TCP, TCP_QUICKACK, &one, sizeof(one));
+    // setsockopt(listenfd, IPPROTO_TCP, TCP_CORK, &one, sizeof(one));
+
     // set socket flag noblock
     if (!setSocketFlag(listenfd, O_NONBLOCK)) {
         return -1;
@@ -163,54 +169,8 @@ int main() {
             if (evs & EPOLLHUP) {
                 // std::cout << "EPOLLHUP" << std::endl;
             }
-            // if (events[i].events & EPOLLERR || events[i].events & EPOLLHUP ||
-            //     !(events[i].events & EPOLLIN)) {  // error
-            //     std::cerr << "[E] epoll event error\n";
-            //     close(events[i].data.fd);
-            // } else if (socketfd == events[i].data.fd) {  // new connection
-            //     while (::accept_connection(socketfd, event, epollfd)) {
-            //     }
-            // } else {  // data to read
-            //     auto fd = events[i].data.fd;
-            //     while (::read_data(fd)) {
-            //     }
-            // }
         }
     }
     close(listenfd);
-    // // accept
-    // int conn;
-    // char clientIP[INET_ADDRSTRLEN] = "";
-    // struct sockaddr_in clientAddr;
-    // socklen_t clientAddrLen = sizeof(clientAddr);
-    // while (true) {
-    //     std::cout << "...listening" << std::endl;
-    //     conn = accept(listenfd, (struct sockaddr*)&clientAddr, &clientAddrLen);
-    //     if (conn < 0) {
-    //         std::cout << "Error: accept" << std::endl;
-    //         continue;
-    //     }
-    //     inet_ntop(AF_INET, &clientAddr.sin_addr, clientIP, INET_ADDRSTRLEN);
-    //     std::cout << "...connect " << clientIP << ":" << ntohs(clientAddr.sin_port) <<
-    //     std::endl;
-
-    //     char buf[255];
-    //     while (true) {
-    //         memset(buf, 0, sizeof(buf));
-    //         int len = recv(conn, buf, sizeof(buf), 0);
-    //         buf[len] = '\0';
-    //         if (strcmp(buf, "exit") == 0) {
-    //             std::cout << "...disconnect " << clientIP << ":" <<
-    //             ntohs(clientAddr.sin_port)
-    //                       << std::endl;
-    //             break;
-    //         }
-    //         std::cout << buf << std::endl;
-    //         send(conn, buf, len, 0);
-    //     }
-
-    //     close(conn);
-    // }
-    // close(listenfd);
     return 0;
 }

@@ -1,5 +1,6 @@
 #include <arpa/inet.h>
 #include <netinet/in.h>
+#include <netinet/tcp.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -43,6 +44,11 @@ int main() {
     if (!setSocketFlag(clientfd, O_NONBLOCK)) {
         return -1;
     }
+
+    // int one = 1;
+    // setsockopt(clientfd, IPPROTO_TCP, TCP_NODELAY, &one, sizeof(one));
+    // setsockopt(clientfd, IPPROTO_TCP, TCP_QUICKACK, &one, sizeof(one));
+    // setsockopt(clientfd, IPPROTO_TCP, TCP_CORK, &one, sizeof(one));
 
     char data[1024 * 1024];
     // char buf[1024 * 1024];

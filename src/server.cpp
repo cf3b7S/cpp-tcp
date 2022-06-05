@@ -116,7 +116,6 @@ int main() {
     // int one = 1;
     // setsockopt(listenfd, IPPROTO_TCP, TCP_NODELAY, &one, sizeof(one));
     // setsockopt(listenfd, IPPROTO_TCP, TCP_QUICKACK, &one, sizeof(one));
-    // setsockopt(listenfd, IPPROTO_TCP, TCP_CORK, &one, sizeof(one));
 
     // set socket flag noblock
     if (!setSocketFlag(listenfd, O_NONBLOCK)) {

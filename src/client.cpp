@@ -48,7 +48,6 @@ int main() {
     // int one = 1;
     // setsockopt(clientfd, IPPROTO_TCP, TCP_NODELAY, &one, sizeof(one));
     // setsockopt(clientfd, IPPROTO_TCP, TCP_QUICKACK, &one, sizeof(one));
-    // setsockopt(clientfd, IPPROTO_TCP, TCP_CORK, &one, sizeof(one));
 
     char data[1024 * 1024];
     // char buf[1024 * 1024];
@@ -85,3 +84,11 @@ int main() {
     close(clientfd);
     return 0;
 }
+
+// TCP_CORK 阻止立即发送
+// int state = 1;
+// setsockopt(sockfd, IPPROTO_TCP, TCP_CORK, &state, sizeof(state));
+// write(http_resp_header);
+// sendfile(sockfd, fd, &off, len);
+// state = 0;
+// setsockopt(sockfd, IPPROTO_TCP, TCP_CORK, &state, sizeof(state));

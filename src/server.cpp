@@ -61,34 +61,6 @@ int addEpollEvent(int epollfd, int socketfd) {
     return 0;
 }
 
-int readData(int socketfd) {
-    memset(msg, 0, sizeof(msg));
-
-    while (true) {
-        int total = sizeof(msg);
-        int remain = total;
-        char* msgPtr = msg;
-        while (true) {
-            int len = recv(socketfd, msgPtr, remain, 0);
-            if (len == -1) {
-                std::cerr << "recv fail:" << strerror(errno) << std::endl;
-            }
-            // else {
-            //     std::cout << len << " bytes recved" << std::endl;
-            // }
-            remain = remain - len;
-            if (remain == 0) {
-                // std::cout << "total " << total << " bytes recved" << std::endl;
-                break;
-            } else {
-                msgPtr += len;
-            }
-        }
-        break;
-    }
-    return 0;
-}
-
 int main() {
     // stick_this_thread_to_core(0);
     std::cout << "This is server" << std::endl;
@@ -117,11 +89,6 @@ int main() {
     // setsockopt(listenfd, IPPROTO_TCP, TCP_NODELAY, &one, sizeof(one));
     // setsockopt(listenfd, IPPROTO_TCP, TCP_QUICKACK, &one, sizeof(one));
 
-    // set socket flag noblock
-    if (!setSocketFlag(listenfd, O_NONBLOCK)) {
-        return -1;
-    }
-
     // listen
     if (listen(listenfd, BACKLOG) == -1) {
         std::cerr << "listen socket fail: " << strerror(errno) << std::endl;
@@ -142,6 +109,7 @@ int main() {
 
     int connfd;
     struct epoll_event events[EPOLL_MAX_EVENTS];
+    int recved = 0;
     while (true) {
         auto n = epoll_wait(epollfd, events, EPOLL_MAX_EVENTS, -1);
         for (int i = 0; i < n; ++i) {
@@ -152,7 +120,12 @@ int main() {
                 if (addEpollEvent(epollfd, connfd) == -1) {
                     return -1;
                 }
+                setSoBuffSize(connfd, SO_SNDBUF, BUFSIZE);
                 setSoBuffSize(connfd, SO_RCVBUF, BUFSIZE);
+
+                int sendBufSize = getSoBuffSize(connfd, SO_SNDBUF);
+                std::cout << "sendBufSize: " << sendBufSize << std::endl;
+
                 int recvBufSize = getSoBuffSize(connfd, SO_RCVBUF);
                 std::cout << "recvBufSize: " << recvBufSize << std::endl;
                 continue;
@@ -163,13 +136,20 @@ int main() {
             }
             if (evs & EPOLLIN) {
                 // std::cout << "EPOLLIN" << std::endl;
-                readData(fd);
+                recvSync(fd, msg, msgLen);
+                sendSync(fd, msg, 128);
+                // int ret = recvAsync(fd, msg + recved, msgLen - recved);
+                // recved += ret;
+                // if (recved == msgLen) {
+                //     sendAsync(fd, msg, 128);
+                //     recved = 0;
+                // }
             }
             if (evs & EPOLLERR) {
-                // std::cout << "EPOLLERR" << std::endl;
+                std::cout << "EPOLLERR" << std::endl;
             }
             if (evs & EPOLLHUP) {
-                // std::cout << "EPOLLHUP" << std::endl;
+                std::cout << "EPOLLHUP" << std::endl;
             }
         }
     }

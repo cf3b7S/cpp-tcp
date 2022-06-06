@@ -15,6 +15,8 @@
 #define BUFSIZE 5000000
 
 char msg[1024 * 1024];
+int msgLen = sizeof(msg);
+
 // char msg[128];
 
 int getSocketFlag(int socketfd) {
@@ -51,6 +53,61 @@ void setSoBuffSize(int socketfd, int optname, int bufsize) {
     if (setsockopt(socketfd, SOL_SOCKET, optname, &bufsize, sizeof(int)) == -1) {
         std::cerr << "set buff size fail: " << strerror(errno) << std::endl;
     }
+}
+
+int sendAsync(int fd, char* msg, int msgLen) {
+    int total = msgLen;
+    int remain = total;
+    int len;
+    char* p = msg;
+    while (true) {
+        len = send(fd, p, remain, O_NONBLOCK);
+        if (len == -1) {
+            std::cerr << "send fail:" << strerror(errno) << std::endl;
+        }
+        remain = remain - len;
+        if (remain == 0 || len == 0) {
+            break;
+        }
+        p += len;
+    }
+    return msgLen - remain;
+}
+
+void sendSync(int fd, char* msg, int msgLen) {
+    int len = send(fd, msg, msgLen, 0);
+    if (len == -1) {
+        std::cerr << "send fail:" << strerror(errno) << std::endl;
+    }
+    std::cout << len << " sendSync" << std::endl;
+}
+
+int recvAsync(int fd, char* msg, int msgLen) {
+    int total = msgLen;
+    int remain = total;
+    int len;
+    char* p = msg;
+    while (true) {
+        len = recv(fd, p, remain, O_NONBLOCK);
+        if (len == -1) {
+            std::cerr << "recv fail:" << strerror(errno) << std::endl;
+        }
+        remain = remain - len;
+        if (remain == 0 || len == 0) {
+            break;
+        }
+        p += len;
+    }
+    // std::cout << msgLen - remain << " recved" << std::endl;
+    return msgLen - remain;
+}
+
+void recvSync(int fd, char* msg, int msgLen) {
+    int len = recv(fd, msg, msgLen, 0);
+    if (len == -1) {
+        std::cerr << "recv fail:" << strerror(errno) << std::endl;
+    }
+    std::cout << len << " recvSync" << std::endl;
 }
 
 // int stick_this_thread_to_core(int core_id) {

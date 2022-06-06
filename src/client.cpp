@@ -41,12 +41,8 @@ int main() {
         return -1;
     }
 
-    // set socket flag noblock
-    if (!setSocketFlag(clientfd, O_NONBLOCK)) {
-        return -1;
-    }
-
     setSoBuffSize(clientfd, SO_SNDBUF, BUFSIZE);
+    setSoBuffSize(clientfd, SO_RCVBUF, BUFSIZE);
 
     int sendBufSize = getSoBuffSize(clientfd, SO_SNDBUF);
     std::cout << "sendBufSize: " << sendBufSize << std::endl;
@@ -58,35 +54,24 @@ int main() {
     // setsockopt(clientfd, IPPROTO_TCP, TCP_NODELAY, &one, sizeof(one));
     // setsockopt(clientfd, IPPROTO_TCP, TCP_QUICKACK, &one, sizeof(one));
 
-    memset(msg, 0, sizeof(msg));
-    // std::cout << sizeof(data) << std::endl;
-
-    int cnt = 100000;
+    int cnt = 1;
     auto start = system_clock::now();
+    int sended = 0;
     while (cnt > 0) {
-        // std::cin >> d;
-        int total = sizeof(msg);
-        int remain = total;
-        char* p = msg;
-        while (true) {
-            int len = send(clientfd, p, remain, 0);
-            // if (len == -1) {
-            //     std::cerr << "send fail:" << strerror(errno) << std::endl;
-            // } else {
-            //     std::cout << len << " bytes sended" << std::endl;
-            // }
-            remain = remain - len;
-            if (remain == 0) {
-                break;
-            } else {
-                p += len;
-            }
-        }
+        sendSync(clientfd, msg, msgLen);
+        recvSync(clientfd, msg, 128);
+
+        // int ret = sendAsync(clientfd, msg, msgLen - sended);
+        // sended += ret;
+        // if (sended == msgLen) {
+        //     recvAsync(clientfd, msg, 128);
+        //     sended = 0;
+        // }
         cnt -= 1;
     }
     auto end = system_clock::now();
     auto duration = duration_cast<microseconds>(end - start);
-    std::cout << double(duration.count()) / 100000.0 << "μs" << std::endl;
+    std::cout << double(duration.count()) / 10000.0 << "μs" << std::endl;
     close(clientfd);
     return 0;
 }

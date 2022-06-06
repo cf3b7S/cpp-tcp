@@ -41,12 +41,29 @@ bool setSocketFlag(int socketfd, int flag) {
     return true;
 }
 
+bool setSocketOpt(int socketfd, int optname, int enable = 1) {
+    if (setsockopt(socketfd, SOL_SOCKET, optname, &enable, sizeof(int)) < 0) {
+        std::cerr << "[E] setsockopt failed" << std::endl;
+        return false;
+    }
+    return true;
+}
+
+// bool getSocketOpt(int socketfd, int optname, int enable = 1) {
+//     if (getsockopt(socketfd, SOL_SOCKET, optname, &enable, sizeof(int)) < 0) {
+//         std::cerr << "[E] setsockopt failed" << std::endl;
+//         return false;
+//     }
+//     return true;
+// }
+
 int getSoBuffSize(int socketfd, int optname) {
     int bufsize = 0;
     socklen_t bufLen = sizeof(bufsize);
     getsockopt(socketfd, SOL_SOCKET, optname, &bufsize, &bufLen);
     return bufsize;
 }
+
 // optname: SO_SNDBUF, SO_RCVBUF
 void setSoBuffSize(int socketfd, int optname, int bufsize) {
     // socklen_t optlen = sizeof(bufsize);
@@ -75,11 +92,11 @@ int sendAsync(int fd, char* msg, int msgLen) {
 }
 
 void sendSync(int fd, char* msg, int msgLen) {
-    int len = send(fd, msg, msgLen, 0);
+    int len = send(fd, msg, msgLen, MSG_WAITALL);
     if (len == -1) {
         std::cerr << "send fail:" << strerror(errno) << std::endl;
     }
-    std::cout << len << " sendSync" << std::endl;
+    // std::cout << len << " sendSync" << std::endl;
 }
 
 int recvAsync(int fd, char* msg, int msgLen) {
@@ -103,11 +120,10 @@ int recvAsync(int fd, char* msg, int msgLen) {
 }
 
 void recvSync(int fd, char* msg, int msgLen) {
-    int len = recv(fd, msg, msgLen, 0);
+    int len = recv(fd, msg, msgLen, MSG_WAITALL);
     if (len == -1) {
         std::cerr << "recv fail:" << strerror(errno) << std::endl;
     }
-    std::cout << len << " recvSync" << std::endl;
 }
 
 // int stick_this_thread_to_core(int core_id) {

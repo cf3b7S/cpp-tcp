@@ -54,7 +54,7 @@ int main() {
     // setsockopt(clientfd, IPPROTO_TCP, TCP_NODELAY, &one, sizeof(one));
     // setsockopt(clientfd, IPPROTO_TCP, TCP_QUICKACK, &one, sizeof(one));
 
-    int cnt = 1;
+    int cnt = 100000;
     auto start = system_clock::now();
     int sended = 0;
     while (cnt > 0) {
@@ -75,6 +75,8 @@ int main() {
     close(clientfd);
     return 0;
 }
+// sendSync 1M recvSync 128 210.509μs
+// sendSync 128 recvSync 1M 212.074μs
 
 // TCP_CORK 阻止立即发送
 // int state = 1;

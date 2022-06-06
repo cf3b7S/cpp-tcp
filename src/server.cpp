@@ -18,14 +18,6 @@
 
 #include "common.h"
 
-bool setSocketOpt(int socketfd, int optname, int enable = 1) {
-    if (setsockopt(socketfd, SOL_SOCKET, optname, &enable, sizeof(int)) < 0) {
-        std::cerr << "[E] setsockopt failed" << std::endl;
-        return false;
-    }
-    return true;
-}
-
 int acceptConn(int epollfd, int socketfd, struct epoll_event& event) {
     struct sockaddr_in sa;
     socklen_t saLen = sizeof(sa);
